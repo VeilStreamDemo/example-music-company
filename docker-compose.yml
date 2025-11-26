@@ -5,15 +5,14 @@ services:
     container_name: source-database
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: db
+      POSTGRES_DB: chinook
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     volumes:
       - ./sample_data/01_Chinook_PostgreSql.sql:/docker-entrypoint-initdb.d/01_Chinook_PostgreSql.sql
       - ./sample_data/02_multiple_users.sql:/docker-entrypoint-initdb.d/02_multiple_users.sql
-      - ./.source-database-data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U user -d chinook -h localhost -p 5432" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h localhost -p 5432" ]
 
   proxy:
     container_name: proxy
