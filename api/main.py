@@ -79,3 +79,10 @@ async def root():
 async def health():
     return {"status": "healthy"}
 
+
+# Add explicit OPTIONS handler for CORS preflight
+@app.options("/{full_path:path}")
+async def options_handler(full_path: str):
+    """Handle CORS preflight requests"""
+    return {}
+
