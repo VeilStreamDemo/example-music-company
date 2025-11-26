@@ -106,3 +106,10 @@ export const playlistsApi = {
   },
 };
 
+export const envvarsApi = {
+  getAll: async (): Promise<Record<string, string>> => {
+    const response = await api.get('/api/envvars');
+    return response.data;
+  },
+};
+

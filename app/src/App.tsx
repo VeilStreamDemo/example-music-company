@@ -7,6 +7,7 @@ import { Navigation } from './components/Navigation';
 import { ArtistsPage } from './pages/ArtistsPage';
 import { ArtistDetailPage } from './pages/ArtistDetailPage';
 import { AlbumDetailPage } from './pages/AlbumDetailPage';
+import { EnvVarsPage } from './pages/EnvVarsPage';
 import { CustomersPage } from './pages/CustomersPage';
 import { EmployeesPage } from './pages/EmployeesPage';
 
@@ -43,6 +44,7 @@ function App() {
                 <Route path="/artists" element={<ArtistsPage />} />
                 <Route path="/artists/:id" element={<ArtistDetailPage />} />
                 <Route path="/artists/:id/albums/:albumId" element={<AlbumDetailPage />} />
+                <Route path="/envvars" element={<EnvVarsPage />} />
                 <Route path="/customers" element={<CustomersPage />} />
                 <Route path="/employees" element={<EmployeesPage />} />
               </Routes>

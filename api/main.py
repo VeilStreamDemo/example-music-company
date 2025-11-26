@@ -1,7 +1,7 @@
 import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import artists, albums, tracks, customers, invoices, employees, genres, playlists
+from routers import artists, albums, tracks, customers, invoices, employees, genres, playlists, envvars
 import database
 
 app = FastAPI(title="Chinook Music API", version="1.0.0")
@@ -24,6 +24,7 @@ app.include_router(invoices.router)
 app.include_router(employees.router)
 app.include_router(genres.router)
 app.include_router(playlists.router)
+app.include_router(envvars.router)
 
 
 async def wait_for_database(max_retries=None, delay=None):
