@@ -3,7 +3,7 @@ FROM node:18-alpine as build
 
 
 # Declare build arguments for React environment variables
-ARG REACT_APP_API_URL
+ARG REACT_APP_API_URL=http://localhost:8000
 ENV REACT_APP_API_URL=$REACT_APP_API_URL
 
 
@@ -35,3 +35,4 @@ RUN echo 'server { \
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
+
