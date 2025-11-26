@@ -8,8 +8,6 @@ services:
       POSTGRES_DB: db
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-    ports:
-      - "5433:5432"
     volumes:
       - ./sample_data/01_Chinook_PostgreSql.sql:/docker-entrypoint-initdb.d/01_Chinook_PostgreSql.sql
       - ./sample_data/02_multiple_users.sql:/docker-entrypoint-initdb.d/02_multiple_users.sql
@@ -24,7 +22,7 @@ services:
     environment:
       DATABASE_URI: postgresql://user:password@source-database:5432/chinook
     ports:
-      - "5432:5432"
+      - "5435:5432"
     depends_on:
       source-database:
         condition: service_healthy
@@ -32,3 +30,30 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+  api:
+    container_name: chinook-api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://user:password@source-database:5432/chinook
+    ports:
+      - "8000:8000"
+    depends_on:
+      source-database:
+        condition: service_healthy
+    restart: unless-stopped
+
+  app:
+    container_name: chinook-app
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: http://localhost:8000
+    ports:
+      - "3002:80"
+    depends_on:
+      - api
+    restart: unless-stopped
