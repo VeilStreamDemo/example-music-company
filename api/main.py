@@ -95,8 +95,20 @@ async def wait_for_database(max_retries=None, delay=None):
     for attempt in range(max_retries):
         try:
             async with database.engine.begin() as conn:
+                # Reflect all tables from the database
                 await conn.run_sync(database.Base.metadata.reflect)
-            print("Database connection successful!")
+            
+            # Verify that key tables are reflected
+            tables = database.Base.metadata.tables
+            required_tables = ['artist', 'album', 'track', 'customer', 'invoice', 'employee', 'genre', 'playlist']
+            missing_tables = [t for t in required_tables if t not in tables]
+            
+            if missing_tables:
+                available = list(tables.keys())
+                raise Exception(f"Missing tables after reflection: {missing_tables}. Available tables: {available[:20]}")
+            
+            print(f"Database connection successful! Reflected {len(tables)} tables.")
+            print(f"Key tables available: {required_tables}")
             return
         except Exception as e:
             if attempt < max_retries - 1:
@@ -104,6 +116,12 @@ async def wait_for_database(max_retries=None, delay=None):
                 await asyncio.sleep(delay)
             else:
                 print(f"Failed to connect to database after {max_retries} attempts: {e}")
+                # Print available tables for debugging
+                try:
+                    tables = database.Base.metadata.tables
+                    print(f"Available tables: {list(tables.keys())[:20]}")
+                except:
+                    pass
                 raise
 
 
