@@ -14,18 +14,15 @@
 ********************************************************************************/
 
 /*******************************************************************************
-   Drop database if it exists
+   Note: Database 'chinook' should already exist (created by POSTGRES_DB)
+   If running manually, uncomment the following lines:
+   
+   DROP DATABASE IF EXISTS chinook;
+   CREATE DATABASE chinook;
+   \c chinook;
+   
+   For docker-entrypoint-initdb.d, we're already in the chinook database context
 ********************************************************************************/
-DROP DATABASE IF EXISTS chinook;
-
-
-/*******************************************************************************
-   Create database
-********************************************************************************/
-CREATE DATABASE chinook;
-
-
-\c chinook;
 
 
 /*******************************************************************************
