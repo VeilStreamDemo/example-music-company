@@ -147,7 +147,13 @@ async def wait_for_database(max_retries=None, delay=None):
 @app.on_event("startup")
 async def startup():
     # Wait for database to be ready and reflect tables
-    await wait_for_database()
+    # Don't fail startup if tables aren't found - allow app to start and handle errors in routes
+    try:
+        await wait_for_database()
+    except Exception as e:
+        print(f"WARNING: Database initialization failed: {e}")
+        print("WARNING: Application will start but API endpoints may fail until database is initialized.")
+        print("WARNING: Ensure database initialization scripts are mounted and run on first startup.")
 
 
 @app.get("/")
