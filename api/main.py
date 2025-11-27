@@ -89,12 +89,31 @@ app.include_router(envvars_no_api)
 async def wait_for_database(max_retries=None, delay=None):
     """Wait for database to be ready with retry logic"""
     import os
+    from sqlalchemy import text
     max_retries = max_retries or int(os.getenv("DB_MAX_RETRIES", "30"))
     delay = delay or float(os.getenv("DB_RETRY_DELAY", "2.0"))
     
     for attempt in range(max_retries):
         try:
             async with database.engine.begin() as conn:
+                # First, verify we can connect and check what database we're connected to
+                result = await conn.execute(text("SELECT current_database(), current_schema()"))
+                db_info = result.fetchone()
+                print(f"Connected to database: {db_info[0]}, schema: {db_info[1]}")
+                
+                # Check if tables exist in the database
+                result = await conn.execute(text("""
+                    SELECT table_name 
+                    FROM information_schema.tables 
+                    WHERE table_schema = 'public' 
+                    ORDER BY table_name
+                """))
+                db_tables = [row[0] for row in result.fetchall()]
+                print(f"Tables found in database: {db_tables[:20]}")
+                
+                if not db_tables:
+                    raise Exception(f"No tables found in database '{db_info[0]}'. Database may be empty or not initialized.")
+                
                 # Reflect all tables from the database
                 await conn.run_sync(database.Base.metadata.reflect)
             
