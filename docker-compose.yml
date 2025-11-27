@@ -11,6 +11,7 @@ services:
     volumes:
       - ./sample_data/01_Chinook_PostgreSql.sql:/docker-entrypoint-initdb.d/01_Chinook_PostgreSql.sql
       - ./sample_data/02_multiple_users.sql:/docker-entrypoint-initdb.d/02_multiple_users.sql
+      - ./.source-database-data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h localhost -p 5432" ]
 
@@ -43,7 +44,7 @@ services:
       source-database:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8000/api/artists || exit 1" ]
+      test: [ "CMD-SHELL", "curl -f http://localhost:8000/health || exit 1" ]
     restart: unless-stopped
 
   app:
