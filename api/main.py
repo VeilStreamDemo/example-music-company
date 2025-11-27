@@ -7,31 +7,15 @@ import database
 app = FastAPI(title="Chinook Music API", version="1.0.0")
 
 # Configure CORS
-# Note: allow_origins=["*"] cannot be used with allow_credentials=True
-# So we either use wildcard without credentials, or specific origins with credentials
-import os
-cors_origins_env = os.getenv("CORS_ORIGINS", "*")
-if cors_origins_env == "*":
-    # Wildcard origin - cannot use credentials
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=False,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-else:
-    # Specific origins - can use credentials
-    cors_origins = [origin.strip() for origin in cors_origins_env.split(",")]
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=cors_origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# Include routers
+# Include routers with /api prefix
 app.include_router(artists.router)
 app.include_router(albums.router)
 app.include_router(tracks.router)
@@ -41,6 +25,65 @@ app.include_router(employees.router)
 app.include_router(genres.router)
 app.include_router(playlists.router)
 app.include_router(envvars.router)
+
+# Also include routers without /api prefix for proxy environments that strip it
+# Import route handlers and create new routers
+from fastapi import APIRouter
+from routers.artists import get_artists, get_artist
+from routers.albums import get_albums, get_album
+from routers.tracks import get_tracks, get_track
+from routers.customers import get_customers, get_customer
+from routers.invoices import get_invoices, get_invoice
+from routers.employees import get_employees
+from routers.genres import get_genres
+from routers.playlists import get_playlists, get_playlist
+from routers.envvars import get_envvars
+
+# Create routers without /api prefix
+artists_no_api = APIRouter(prefix="/artists", tags=["artists"])
+artists_no_api.get("")(get_artists)
+artists_no_api.get("/{artist_id}")(get_artist)
+
+albums_no_api = APIRouter(prefix="/albums", tags=["albums"])
+albums_no_api.get("")(get_albums)
+albums_no_api.get("/{album_id}")(get_album)
+
+tracks_no_api = APIRouter(prefix="/tracks", tags=["tracks"])
+tracks_no_api.get("")(get_tracks)
+tracks_no_api.get("/{track_id}")(get_track)
+
+customers_no_api = APIRouter(prefix="/customers", tags=["customers"])
+customers_no_api.get("")(get_customers)
+customers_no_api.get("/{customer_id}")(get_customer)
+
+invoices_no_api = APIRouter(prefix="/invoices", tags=["invoices"])
+invoices_no_api.get("")(get_invoices)
+invoices_no_api.get("/{invoice_id}")(get_invoice)
+
+employees_no_api = APIRouter(prefix="/employees", tags=["employees"])
+employees_no_api.get("")(get_employees)
+
+genres_no_api = APIRouter(prefix="/genres", tags=["genres"])
+genres_no_api.get("")(get_genres)
+
+playlists_no_api = APIRouter(prefix="/playlists", tags=["playlists"])
+playlists_no_api.get("")(get_playlists)
+playlists_no_api.get("/{playlist_id}")(get_playlist)
+
+envvars_no_api = APIRouter(prefix="/envvars", tags=["envvars"])
+envvars_no_api.get("")(get_envvars)
+
+# Include routers without /api prefix
+app.include_router(artists_no_api)
+app.include_router(albums_no_api)
+app.include_router(tracks_no_api)
+app.include_router(customers_no_api)
+app.include_router(invoices_no_api)
+app.include_router(employees_no_api)
+app.include_router(genres_no_api)
+app.include_router(playlists_no_api)
+app.include_router(envvars_no_api)
+
 
 
 async def wait_for_database(max_retries=None, delay=None):
@@ -78,11 +121,4 @@ async def root():
 @app.get("/health")
 async def health():
     return {"status": "healthy"}
-
-
-# Add explicit OPTIONS handler for CORS preflight
-@app.options("/{full_path:path}")
-async def options_handler(full_path: str):
-    """Handle CORS preflight requests"""
-    return {}
 
