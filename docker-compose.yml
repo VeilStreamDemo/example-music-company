@@ -13,7 +13,6 @@ services:
     volumes:
       - ./sample_data/01_Chinook_PostgreSql.sql:/docker-entrypoint-initdb.d/01_Chinook_PostgreSql.sql
       - ./sample_data/02_multiple_users.sql:/docker-entrypoint-initdb.d/02_multiple_users.sql
-      - ./.source-database-data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h localhost -p 5432" ]
 
@@ -23,8 +22,11 @@ services:
     env_file: ./.env
     environment:
       DATABASE_URI: postgresql://user:password@source-database:5432/chinook
+    volumes:
+      - .proxy-data/:/veilstream/
     ports:
       - "5435:5432"
+      - "8683:8683"
     depends_on:
       source-database:
         condition: service_healthy

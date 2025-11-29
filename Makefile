@@ -1,15 +1,15 @@
 
 psql_source_database:
-	docker compose exec source-database psql -h localhost -U user -d chinook -p 5432 -W
+	psql -h localhost -U user -d chinook -p 5432 -W
 
-psql_veilstream_proxy:
-	docker compose exec source-database psql -h veilstream-postgres-proxy -U user -d chinook -p 5432 -W
+psql_proxy:
+	psql -h localhost -U user -d chinook -p 5435 -W
 
-psql_veilstream_proxy_alice:
-	docker compose exec source-database psql -h veilstream-postgres-proxy -U alice -d chinook -p 5432 -W
+psql_proxy_alice:
+	psql -h localhost -U alice -d chinook -p 5435 -W
 
-psql_veilstream_proxy_bob:
-	docker compose exec source-database psql -h veilstream-postgres-proxy -U bob -d chinook -p 5432 -W
+psql_proxy_bob:
+	psql -h localhost -U bob -d chinook -p 5435 -W
 
-psql_veilstream_proxy_chris:
-	docker compose exec source-database psql -h veilstream-postgres-proxy -U chris -d chinook -p 5432 -W
+psql_proxy_chris:
+	psql -h localhost -U chris -d chinook -p 5435 -W
