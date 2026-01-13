@@ -1,8 +1,8 @@
 
 services:
 
-  source-database:
-    container_name: source-database
+  database:
+    container_name: database
     build:
       context: .
       dockerfile: Dockerfile.chinook
@@ -20,14 +20,14 @@ services:
     container_name: proxy
     image: veilstream/veilstream-postgres-proxy:latest
     environment:
-      DATABASE_URI: postgresql://user:password@source-database:5432/chinook
+      DATABASE_URI: postgresql://user:password@database:5432/chinook
     volumes:
       - .proxy-data/:/veilstream/
     ports:
       - "5436:5432"
       - "8683:8683"
     depends_on:
-      source-database:
+      database:
         condition: service_healthy
     logging:
       options:
@@ -39,14 +39,14 @@ services:
     image: veilstream/veilstream-postgres-proxy:latest
     env_file: ./.env
     environment:
-      DATABASE_URI: postgresql://user:password@source-database:5432/chinook
+      DATABASE_URI: postgresql://user:password@database:5432/chinook
     volumes:
       - .proxy-data/:/veilstream/
     ports:
       - "5435:5432"
       - "8684:8683"
     depends_on:
-      source-database:
+      database:
         condition: service_healthy
     logging:
       options:
@@ -59,12 +59,9 @@ services:
       context: ./api
       dockerfile: Dockerfile
     environment:
-      DATABASE_URL: postgresql+asyncpg://user:password@source-database:5432/chinook
+      DATABASE_URL: postgresql+asyncpg://user:password@database:5432/chinook
     ports:
       - "8000:8000"
-    depends_on:
-      source-database:
-        condition: service_healthy
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:8000/health || exit 1" ]
     restart: unless-stopped
