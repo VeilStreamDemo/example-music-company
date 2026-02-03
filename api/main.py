@@ -10,9 +10,6 @@ app = FastAPI(title="Chinook Music API", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    # IMPORTANT:
-    # - Browsers disallow `Access-Control-Allow-Origin: *` when credentials are enabled.
-    # - This API is used via bearerless JSON requests (no cookies), so credentials aren't needed.
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],

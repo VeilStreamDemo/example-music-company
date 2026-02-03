@@ -1,15 +1,25 @@
+.PHONY: seed-prod help
 
-psql_source_database:
-	psql -h localhost -U user -d chinook -p 5432 -W
+# Default target
+help:
+	@echo "Available targets:"
+	@echo "  seed-prod    - Seed production database with Chinook data"
+	@echo "                Usage: make seed-prod DATABASE_URL='postgresql://user:pass@host:port/dbname'"
 
-psql_proxy:
-	psql -h localhost -U user -d chinook -p 5435 -W
+# Seed production database
+seed-prod:
+	@if [ -z "$(DATABASE_URL)" ]; then \
+		echo "Error: DATABASE_URL is required"; \
+		echo "Usage: make seed-prod DATABASE_URL='postgresql://user:pass@host:port/dbname'"; \
+		exit 1; \
+	fi
+	@echo "Seeding production database..."
+	@psql "$(DATABASE_URL)" -f database/01_Chinook_PostgreSql.sql
+	@DB_NAME=$$(echo "$(DATABASE_URL)" | sed -n 's|.*/\([^?]*\).*|\1|p'); \
+	if [ -z "$$DB_NAME" ]; then \
+		echo "Warning: Could not extract database name from DATABASE_URL, using 'chinook'"; \
+		DB_NAME="chinook"; \
+	fi; \
+	sed "s/\\\\c chinook;/\\\\c $$DB_NAME;/" database/02_multiple_users.sql | psql "$(DATABASE_URL)"
+	@echo "Database seeded successfully!"
 
-psql_proxy_alice:
-	psql -h localhost -U alice -d chinook -p 5435 -W
-
-psql_proxy_bob:
-	psql -h localhost -U bob -d chinook -p 5435 -W
-
-psql_proxy_chris:
-	psql -h localhost -U chris -d chinook -p 5435 -W

@@ -4,54 +4,18 @@ services:
   database:
     container_name: database
     build:
-      context: .
-      dockerfile: Dockerfile.chinook
+      context: ./database
+      dockerfile: Dockerfile
     environment:
-      POSTGRES_DB: chinook
+      POSTGRES_DB: database
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     volumes:
-      - ./sample_data/01_Chinook_PostgreSql.sql:/docker-entrypoint-initdb.d/01_Chinook_PostgreSql.sql
-      - ./sample_data/02_multiple_users.sql:/docker-entrypoint-initdb.d/02_multiple_users.sql
+      - ./01_Chinook_PostgreSql.sql:/docker-entrypoint-initdb.d/01_Chinook_PostgreSql.sql
+      - ./02_multiple_users.sql:/docker-entrypoint-initdb.d/02_multiple_users.sql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h localhost -p 5432" ]
 
-  proxy:
-    container_name: proxy
-    image: veilstream/veilstream-postgres-proxy:latest
-    environment:
-      DATABASE_URI: postgresql://user:password@database:5432/chinook
-    volumes:
-      - .proxy-data/:/veilstream/
-    ports:
-      - "5436:5432"
-      - "8683:8683"
-    depends_on:
-      database:
-        condition: service_healthy
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  proxy-api:
-    container_name: proxy-api
-    image: veilstream/veilstream-postgres-proxy:latest
-    env_file: ./.env
-    environment:
-      DATABASE_URI: postgresql://user:password@database:5432/chinook
-    volumes:
-      - .proxy-data/:/veilstream/
-    ports:
-      - "5435:5432"
-      - "8684:8683"
-    depends_on:
-      database:
-        condition: service_healthy
-    logging:
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   api:
     container_name: api
@@ -59,7 +23,7 @@ services:
       context: ./api
       dockerfile: Dockerfile
     environment:
-      DATABASE_URL: postgresql+asyncpg://user:password@database:5432/chinook
+      DATABASE_URL: postgresql+asyncpg://user:password@database:5432/database
     ports:
       - "8000:8000"
     healthcheck:
@@ -72,8 +36,7 @@ services:
       context: ./app
       dockerfile: Dockerfile
       args:
-        REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:8000}
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
     ports:
       - "3002:80"
     restart: unless-stopped
-

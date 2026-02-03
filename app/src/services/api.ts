@@ -10,13 +10,10 @@ import {
   Playlist,
 } from '../types';
 
-// Prefer same-origin requests (works cleanly in hosted environments with a reverse-proxy).
-// If you want to point directly at a backend (e.g. local dev), set REACT_APP_API_URL.
-const API_URL = (process.env.REACT_APP_API_URL || '').trim();
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const api = axios.create({
-  // If empty, axios will use relative URLs on the current origin.
-  baseURL: API_URL || undefined,
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },

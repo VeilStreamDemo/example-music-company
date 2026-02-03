@@ -1,32 +1,21 @@
 # VeilStream Example
-This is an example of how to use VeilStream to mask and remove sensitive information from a postgresql connection.
+This is an example of how to use VeilStream for a preview environment
 
 ## Usage
 
-### 1) clone the repository
-To run this example, first clone the repository.
-```bash
-git clone git@github.com:veilstream/veilstream-example.git
-```
+### 1) fork the repo
+### 2) login to [app.veilstream.com]
+### 3) connect the cloned repository to VeilStream at [https://app.veilstream.com/onboarding]
+### 4) click "Complete Setup"
+![click complete setup](./docs/Screenshot_20260202_211202.png)
+### 5) click "Deploy from Main"
+![click deploy from main](./docs/Screenshot_20260202_211435.png)
+### 6) go to the 3 dots menu, settings, and update the app container's env var to be `{{api-external-url}}`
+![set env var](./docs/Screenshot_20260202_211850.png)
+### 7) create an environment off your main branch
+### 8) wait for the deployment
+### 9) review the deployed version of this application
 
-### 2) get an API key
-- log in to your VeilStream account at https://app.veilstream.com
-- Define a new database in the VeilStream dashboard.
-- Then, create a `.env` file with your API key in it. It should look like this:
-```bash
-VEILSTREAM_API_KEY=<your-api-key>
-```
+## What this example application is:
 
-### 3) start the containers
-Then, turn on your containers
-```bash
-docker-compose up -d
-```
-
-### 4) experiment
-now you can configure the proxy, and see how it affects the data.
-```bash
-make psql_source_database
-make psql_veilstream_proxy
-```
-*Note:* the password is `password`
+It's the chinook dataset used to populate a postgres database, representing a music company. The app container is a react app that is the frontend talking to a simple fastapi api container backed by the postgres database.
