@@ -4,8 +4,8 @@ This is an example of how to use VeilStream for a preview environment
 ## Usage
 
 ### 1) fork the repo
-### 2) login to [app.veilstream.com]
-### 3) connect the cloned repository to VeilStream at [app.veilstream.com/onboarding]
+### 2) login to [app.veilstream.com](app.veilstream.com)
+### 3) connect the cloned repository to VeilStream at [app.veilstream.com/onboarding](app.veilstream.com/onboarding)
 ### 4) click "Complete Setup"
 ![click complete setup](./docs/Screenshot_20260202_211202.png)
 ### 5) click "Deploy from Main"
